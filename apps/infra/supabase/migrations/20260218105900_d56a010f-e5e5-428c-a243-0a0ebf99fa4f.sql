@@ -1,6 +1,17 @@
 
--- 1. Create app_role enum
-CREATE TYPE public.app_role AS ENUM ('admin', 'edit', 'watch');
+
+-- 1. Create app_role enum (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_type t
+    JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE t.typname = 'app_role' AND n.nspname = 'public'
+  ) THEN
+    CREATE TYPE public.app_role AS ENUM ('admin', 'edit', 'watch');
+  END IF;
+END $$;
 
 -- 2. Create project_roles table (project-specific RBAC)
 CREATE TABLE public.project_roles (
