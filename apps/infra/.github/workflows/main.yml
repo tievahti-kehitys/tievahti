@@ -1,0 +1,34 @@
+name: Deploy Supabase (PROD)
+
+on:
+  push:
+    branches: [ production ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # GitHub Environments: Settings -> Environments -> production
+    environment: production
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase project
+        run: supabase link --project-ref $SUPABASE_PROJECT_REF
+
+      - name: Push database migrations (tables, functions, triggers, RLS, etc.)
+        run: supabase db push --linked
+
+      - name: Deploy edge functions
+        run: supabase functions deploy --project-ref $SUPABASE_PROJECT_REF

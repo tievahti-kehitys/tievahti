@@ -1,0 +1,275 @@
+@import "@fontsource/poppins/300.css";
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
+@import "@fontsource/poppins/900.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tievahti Infra Design System - Viranomaismainen ja luotettava */
+
+@layer base {
+  :root {
+    /* Tievahti Brand Colors - Täsmälliset arvot */
+    --tievahti-yellow: 40 95% 58%;      /* #FEAD2D - Pellon keltainen */
+    --tievahti-green: 93 54% 53%;       /* #7FC646 - Metsän vihreä */
+    --tievahti-blue: 193 90% 55%;       /* #22C3F3 - Järven sininen */
+    --tievahti-gray: 0 0% 31%;          /* #505050 - Kallion harmaa */
+
+    /* Primary = Pellon keltainen - Päänapit ja CTA:t */
+    --primary: 40 95% 58%;              /* #FEAD2D */
+    --primary-foreground: 0 0% 20%;     /* Tumma teksti keltaisella */
+    
+    /* Secondary = Valkoinen + harmaa reuna */
+    --secondary: 0 0% 98%;              /* Lähes valkoinen */
+    --secondary-foreground: 0 0% 31%;   /* Kallionharmaa teksti */
+    
+    /* Accent = Järven sininen - Info, linkit */
+    --accent: 193 90% 55%;              /* #22C3F3 */
+    --accent-foreground: 0 0% 100%;
+    
+    /* Neutral Colors - Valkoinen pääsisältö, harmaa rakenteet */
+    --background: 0 0% 96%;             /* Kevyt harmaa tausta */
+    --foreground: 0 0% 31%;             /* #505050 - Kallion harmaa */
+    
+    --card: 0 0% 100%;                  /* #FFFFFF - Valkoinen sisältötausta */
+    --card-foreground: 0 0% 31%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 31%;
+    
+    --muted: 0 0% 92%;                  /* Kevyt harmaa */
+    --muted-foreground: 0 0% 45%;
+    
+    --border: 0 0% 85%;                 /* Hillitty reunaväri */
+    --input: 0 0% 100%;                 /* Valkoinen kenttätausta */
+    --ring: 40 95% 58%;                 /* Keltainen focus */
+    
+    /* Destructive - Hillitty punainen */
+    --destructive: 0 55% 45%;           /* Rauhallisempi punainen */
+    --destructive-foreground: 0 0% 100%;
+    
+    --radius: 0.375rem;                 /* Maltilliset pyöristykset */
+
+    /* Sidebar - Kallionharmaa infra-look */
+    --sidebar-background: 0 0% 31%;     /* #505050 */
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 40 95% 58%;      /* Keltainen aktiivinen */
+    --sidebar-primary-foreground: 0 0% 20%;
+    --sidebar-accent: 0 0% 38%;         /* Hieman vaaleampi harmaa */
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 40%;
+    --sidebar-ring: 40 95% 58%;
+
+    /* Custom tokens */
+    --surface: 0 0% 100%;
+    --surface-elevated: 0 0% 100%;
+    --divider: 0 0% 88%;
+    
+    /* Map-specific tokens */
+    --map-control-bg: 0 0% 100%;
+    --map-control-shadow: 0 2px 8px rgba(80, 80, 80, 0.12);
+    
+    /* Status colors */
+    --success: 93 54% 53%;              /* Metsän vihreä - Onnistumiset */
+    --warning: 40 95% 58%;              /* Pellon keltainen */
+    --error: 0 55% 45%;                 /* Hillitty punainen */
+    --info: 193 90% 55%;                /* Järven sininen */
+    
+    /* Category colors */
+    --category-murskeeta: 0 0% 45%;
+    --category-rummut: 93 54% 53%;
+    --category-kuivatus: 193 90% 55%;
+    --category-paikallinen: 40 95% 58%;
+  }
+
+  .dark {
+    --background: 0 0% 14%;
+    --foreground: 0 0% 92%;
+    
+    --card: 0 0% 18%;
+    --card-foreground: 0 0% 92%;
+    
+    --popover: 0 0% 18%;
+    --popover-foreground: 0 0% 92%;
+    
+    --primary: 40 95% 58%;
+    --primary-foreground: 0 0% 15%;
+    
+    --secondary: 0 0% 25%;
+    --secondary-foreground: 0 0% 92%;
+    
+    --muted: 0 0% 22%;
+    --muted-foreground: 0 0% 60%;
+    
+    --accent: 193 90% 55%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 50% 40%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 0 0% 25%;
+    --input: 0 0% 22%;
+    --ring: 40 95% 58%;
+    
+    --sidebar-background: 0 0% 12%;
+    --sidebar-foreground: 0 0% 92%;
+    --sidebar-primary: 40 95% 58%;
+    --sidebar-primary-foreground: 0 0% 15%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 40 95% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight text-foreground;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h1 { @apply text-xl font-black; }
+  h2 { @apply text-lg font-bold; }
+  h3 { @apply text-base font-semibold; }
+}
+
+@layer components {
+  /* Panel styles */
+  .panel {
+    @apply bg-card rounded-md border border-border shadow-sm;
+  }
+  
+  .panel-header {
+    @apply px-4 py-3 border-b border-border font-medium text-sm;
+  }
+  
+  .panel-content {
+    @apply p-4;
+  }
+
+  /* Status indicators */
+  .status-saving {
+    @apply text-warning animate-pulse;
+  }
+  
+  .status-saved {
+    @apply text-success;
+  }
+  
+  .status-error {
+    @apply text-destructive;
+  }
+
+  /* Map controls */
+  .map-control {
+    @apply bg-card rounded-md shadow-md border border-border;
+  }
+
+  /* Product markers */
+  .marker-point {
+    @apply rounded-full border-2 border-card shadow-md;
+  }
+
+  /* List items */
+  .list-item {
+    @apply px-3 py-2 hover:bg-muted/50 rounded-sm cursor-pointer transition-colors;
+  }
+  
+  .list-item-active {
+    @apply bg-primary/10 text-primary border-l-2 border-primary;
+  }
+}
+
+/* Leaflet overrides for Tievahti style */
+.leaflet-container {
+  font-family: inherit;
+  background: #d4dac0;
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(46, 58, 68, 0.12) !important;
+}
+
+.leaflet-control-zoom a {
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: hsl(var(--muted)) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(46, 58, 68, 0.15);
+}
+
+.leaflet-popup-tip {
+  background: hsl(var(--card));
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Mobile safe area utilities */
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-pl {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-pr {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Forest Mode specific styles */
+.vertex-handle {
+  z-index: 1000 !important;
+}
+.vertex-handle:hover .vertex-delete-btn,
+.vertex-handle:hover .branch-delete-btn {
+  display: flex !important;
+}
+
+.custom-marker {
+  z-index: 500;
+}
