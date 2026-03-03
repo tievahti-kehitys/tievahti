@@ -1,33 +1,43 @@
-      - name: Test infra role (force IPv4 address)
+name: Test DB role (infra)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install psql + dns utils
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client dnsutils
+
+      - name: Test infra role (force IPv4) + create schema/table
         env:
           INFRA_DB_URL: ${{ secrets.INFRA_DB_URL }}
           PGSSLMODE: require
+        shell: bash
         run: |
-          set -e
+          set -euo pipefail
 
-          HOST=$(python3 - <<'PY'
-import os
-from urllib.parse import urlparse
-print(urlparse(os.environ["INFRA_DB_URL"]).hostname)
-PY
-)
-          IPV4=$(getent ahostsv4 "$HOST" | awk '{print $1; exit}')
+          # Extract hostname from the URL (works for postgresql://user:pass@host:port/db?params)
+          HOST="$(echo "$INFRA_DB_URL" | sed -E 's#^[a-z]+://([^@]+@)?([^:/?]+).*#\2#')"
           echo "HOST=$HOST"
+
+          # Resolve IPv4 A record
+          IPV4="$(dig +short A "$HOST" | head -n 1)"
           echo "IPV4=$IPV4"
 
-          # strip host part from URL so -h takes effect cleanly
-          URL_NO_HOST=$(python3 - <<'PY'
-import os
-from urllib.parse import urlparse
-u=urlparse(os.environ["INFRA_DB_URL"])
-# rebuild without hostname (psql will use -h)
-userpass = (u.username or "") + ((":"+u.password) if u.password else "")
-auth = (userpass + "@") if userpass else ""
-port = (":"+str(u.port)) if u.port else ""
-path = u.path or ""
-query = ("?"+u.query) if u.query else ""
-print(f"postgresql://{auth}{port}{path}{query}")
-PY
-)
+          if [ -z "$IPV4" ]; then
+            echo "No IPv4 A record found for host"
+            exit 1
+          fi
 
-          psql "$URL_NO_HOST" -h "$IPV4" -v ON_ERROR_STOP=1 -c "select now();"
+          # Force IPv4 connection even if hostname resolves to IPv6 first
+          export PGHOSTADDR="$IPV4"
+
+          psql "$INFRA_DB_URL" -v ON_ERROR_STOP=1 -c "select now();"
+          psql "$INFRA_DB_URL" -v ON_ERROR_STOP=1 -c "create schema if not exists infra;"
+          psql "$INFRA_DB_URL" -v ON_ERROR_STOP=1 -c "create extension if not exists pgcrypto;"
+          psql "$INFRA_DB_URL" -v ON_ERROR_STOP=1 -c "create table if not exists infra.projects_test_ci (id uuid primary key default gen_random_uuid());"
+          psql "$INFRA_DB_URL" -tA -c "select table_schema, table_name from information_schema.tables where table_name='projects_test_ci';"
