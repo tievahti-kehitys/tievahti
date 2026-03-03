@@ -1,40 +1,10 @@
-name: Infra DB migrations (schema infra)
-
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - "apps/infra/supabase/migrations/**"
-
-jobs:
-  migrate:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
+      - name: Build migrations with schema wrapper (infra)
         shell: bash
-        working-directory: apps/infra
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Link project
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-        run: |
-          supabase link --project-ref "$SUPABASE_PROJECT_REF"
-
-      - name: Build migrations with schema wrapper
         run: |
           set -euo pipefail
 
-          SRC="supabase/migrations"
-          BUILD="supabase/migrations_build"
+          SRC="apps/infra/supabase/migrations"
+          BUILD="apps/infra/supabase/migrations_build"
 
           mkdir -p "$BUILD"
           rm -f "$BUILD"/*.sql
@@ -60,17 +30,31 @@ jobs:
           echo "Built migrations:"
           ls -la "$BUILD"
 
-      - name: Push migrations (using build folder)
+      - name: Push migrations (infra build folder)
+        shell: bash
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          # Supabase CLI reads migrations from supabase/migrations
-          mv supabase/migrations supabase/migrations_orig
+          set -euo pipefail
+
+          # link MUST run in the folder that contains supabase/config.toml
+          cd apps/infra
+
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+          # Swap migrations folder inside apps/infra
+          if [ -d supabase/migrations ]; then
+            mv supabase/migrations supabase/migrations_orig
+          fi
+
           mv supabase/migrations_build supabase/migrations
 
           supabase db push
 
           # restore (optional)
           rm -rf supabase/migrations
-          mv supabase/migrations_orig supabase/migrations
+          if [ -d supabase/migrations_orig ]; then
+            mv supabase/migrations_orig supabase/migrations
+          fi
