@@ -3,15 +3,19 @@ name: Sync Lovable apps into monorepo
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"  # 30 min välein (muuta haluamaksesi)
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout monorepo
+      - name: Checkout monorepo (dev)
         uses: actions/checkout@v4
         with:
+          ref: dev
           fetch-depth: 0
 
       - name: Configure git
@@ -22,14 +26,12 @@ jobs:
       - name: Add remotes
         run: |
           git remote add lovable-infra https://github.com/tievahti-kehitys/tievahti-infra.git || true
-          git fetch lovable-infra
-
+          git fetch lovable-infra main
 
       - name: Pull infra subtree
         run: |
           git subtree pull --prefix=apps/infra lovable-infra main --squash
 
-
-      - name: Push changes
+      - name: Push changes to dev
         run: |
-          git push
+          git push origin dev
