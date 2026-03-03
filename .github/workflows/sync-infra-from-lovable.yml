@@ -1,0 +1,51 @@
+name: Sync infra app from tievahti-infra
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-infra
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout monorepo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout tievahti-infra repo
+        uses: actions/checkout@v4
+        with:
+          # IMPORTANT: set OWNER below (e.g. tievahti/tievahti-infra or JuhoRomppainen/tievahti-infra)
+          repository: tievahti-kehitys/tievahti-infra
+          token: ${{ secrets.LOVABLE_INFRA_TOKEN }}
+          path: _tievahti_infra
+
+      - name: Sync into apps/infra
+        run: |
+          rsync -a --delete \
+            --exclude ".git" \
+            _tievahti_infra/ apps/infra/
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add apps/infra
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+
+          git commit -m "sync(infra): update from tievahti-infra"
+          git push
