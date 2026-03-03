@@ -1,0 +1,13 @@
+project_id = "njcwfrpbvpjsyovhcwfe"
+
+[functions.manage-project-role]
+verify_jwt = false
+
+[functions.check-email-domain]
+verify_jwt = false
+
+[functions.google-places-search]
+verify_jwt = false
+
+[functions.google-directions]
+verify_jwt = false

@@ -1,0 +1,1 @@
+ALTER TABLE public.catalog_items ADD COLUMN default_instruction_text TEXT DEFAULT NULL;
