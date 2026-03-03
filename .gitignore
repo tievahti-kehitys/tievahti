@@ -1,0 +1,22 @@
+# Riippuvuudet
+node_modules/
+.pnpm-store/
+
+# Ympäristömuuttujat (ERITTÄIN TÄRKEÄ)
+.env
+.env.*
+!.env.example
+
+# Build-tulokset
+dist/
+build/
+.vercel/
+
+# Käyttöjärjestelmän omat tiedostot
+.DS_Store
+Thumbs.db
+
+# Lovable & Supabase -lokit
+supabase/.temp/
+.lovable/
+
